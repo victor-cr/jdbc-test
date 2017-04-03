@@ -25,6 +25,7 @@ public abstract class UtcTimestampTest implements Test {
 
     UtcTimestampTest(DataSource dataSource, String tableName, String columnName, Timestamp value, String defaultTimeZoneId) {
         this.check = new Utc2UtcTimestampCheck(dataSource, tableName, columnName);
+        
         this.tableName = tableName;
         this.columnName = columnName;
         this.value = value;

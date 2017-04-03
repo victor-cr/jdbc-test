@@ -3,6 +3,7 @@ target/
 *.class
 
 # IntelliJ IDEA
+.ideaDataSources/
 *.ipr
 *.iml
 *.iws

@@ -18,32 +18,37 @@ import java.util.logging.Logger;
  * Hello world!
  */
 public class Runner {
-    private static final String DRIVER_CLASS = "oracle.jdbc.OracleDriver";
-    private static final String DRIVER_URL = "<JDBC URL>";
-    private static final String DRIVER_USER = "<USER NAME>";
-    private static final String DRIVER_PASS = "<PASSWORD>";
-    private static final DataSource DS = new SimpleDataSource(DRIVER_URL, DRIVER_USER, DRIVER_PASS);
-
-    private static final Test[] SUITE = new Test[]{
-            new DstUtcTimestampTest(DS, "TMP_DATE", "FIELD_TIMESTAMP"),
-            new DstUtcTimestampTest(DS, "TMP_DATE", "FIELD_TIMESTAMPTZ"),
-            new NormalUtcTimestampTest(DS, "TMP_DATE", "FIELD_TIMESTAMP"),
-            new NormalUtcTimestampTest(DS, "TMP_DATE", "FIELD_TIMESTAMPTZ"),
-            new PureUtcTimestampTest(DS, "TMP_DATE", "FIELD_TIMESTAMP"),
-            new PureUtcTimestampTest(DS, "TMP_DATE", "FIELD_TIMESTAMPTZ")
-    };
+    private static final Driver DRIVER;
 
     static {
         try {
-            DriverManager.registerDriver((Driver) Class.forName(DRIVER_CLASS).newInstance());
+            DRIVER = (Driver) Class.forName(Param.DRIVER_CLASS.get()).newInstance();
+
+            DriverManager.registerDriver(DRIVER);
         } catch (Exception e) {
-            throw new IllegalStateException("Cannot find/instantiate proper JDBC driver: " + DRIVER_CLASS);
+            throw new IllegalStateException("Cannot find/instantiate proper JDBC driver: " + Param.DRIVER_CLASS.get());
         }
     }
 
+    private static final DataSource DS = new SimpleDataSource(Param.DRIVER_URL.get(), Param.DRIVER_USERNAME.get(), Param.DRIVER_PASSWORD.get());
+    private static final Test[] SUITE = new Test[]{
+            new DstUtcTimestampTest(DS, Param.TABLE_NAME.get(), Param.FIELD_DATE.get()),
+            new DstUtcTimestampTest(DS, Param.TABLE_NAME.get(), Param.FIELD_TIMESTAMP.get()),
+            new DstUtcTimestampTest(DS, Param.TABLE_NAME.get(), Param.FIELD_ZONED.get()),
+            new DstUtcTimestampTest(DS, Param.TABLE_NAME.get(), Param.FIELD_LOCAL.get()),
+            new NormalUtcTimestampTest(DS, Param.TABLE_NAME.get(), Param.FIELD_DATE.get()),
+            new NormalUtcTimestampTest(DS, Param.TABLE_NAME.get(), Param.FIELD_TIMESTAMP.get()),
+            new NormalUtcTimestampTest(DS, Param.TABLE_NAME.get(), Param.FIELD_ZONED.get()),
+            new NormalUtcTimestampTest(DS, Param.TABLE_NAME.get(), Param.FIELD_LOCAL.get()),
+            new PureUtcTimestampTest(DS, Param.TABLE_NAME.get(), Param.FIELD_DATE.get()),
+            new PureUtcTimestampTest(DS, Param.TABLE_NAME.get(), Param.FIELD_TIMESTAMP.get()),
+            new PureUtcTimestampTest(DS, Param.TABLE_NAME.get(), Param.FIELD_ZONED.get()),
+            new PureUtcTimestampTest(DS, Param.TABLE_NAME.get(), Param.FIELD_LOCAL.get())
+    };
+
     public static void main(String[] args) {
         System.out.println("====================================================================");
-        System.out.println("START tests");
+        System.out.println("START tests: " + Param.DRIVER_CLASS.get() + " v" + DRIVER.getMajorVersion() + "." + DRIVER.getMinorVersion());
         System.out.println("====================================================================");
 
         for (Test test : SUITE) {
