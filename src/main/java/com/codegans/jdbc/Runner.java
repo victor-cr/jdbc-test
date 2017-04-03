@@ -8,6 +8,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
@@ -17,7 +18,11 @@ import java.util.logging.Logger;
  * Hello world!
  */
 public class Runner {
-    private static final DataSource DS = new SimpleDataSource("JDBC_URL", "USER", "PASSWORD");
+    private static final String DRIVER_CLASS = "oracle.jdbc.OracleDriver";
+    private static final String DRIVER_URL = "<JDBC URL>";
+    private static final String DRIVER_USER = "<USER NAME>";
+    private static final String DRIVER_PASS = "<PASSWORD>";
+    private static final DataSource DS = new SimpleDataSource(DRIVER_URL, DRIVER_USER, DRIVER_PASS);
 
     private static final Test[] SUITE = new Test[]{
             new DstUtcTimestampTest(DS, "TMP_DATE", "FIELD_TIMESTAMP"),
@@ -27,6 +32,14 @@ public class Runner {
             new PureUtcTimestampTest(DS, "TMP_DATE", "FIELD_TIMESTAMP"),
             new PureUtcTimestampTest(DS, "TMP_DATE", "FIELD_TIMESTAMPTZ")
     };
+
+    static {
+        try {
+            DriverManager.registerDriver((Driver) Class.forName(DRIVER_CLASS).newInstance());
+        } catch (Exception e) {
+            throw new IllegalStateException("Cannot find/instantiate proper JDBC driver: " + DRIVER_CLASS);
+        }
+    }
 
     public static void main(String[] args) {
         System.out.println("====================================================================");
